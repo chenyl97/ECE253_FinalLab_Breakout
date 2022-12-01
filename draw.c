@@ -2,6 +2,8 @@
 #include "lab2a.h"
 #include "lcd.h"
 #include "draw.h"
+
+
 // Draw
 
 void setColors(Color* fg, Color* bg) {
@@ -45,14 +47,30 @@ void drawSlider(Slider* obj, u32 focused) {
 	u32 w = obj->super.w;
 	u32 h = obj->super.h;
 	setColors(fg, bg);
-	fillRect(x, y, w, h, MARGIN);
+	fillRect(x, y, 200, h, MARGIN);
 	setColors(br, br);
-	fillRect(x + MARGIN, y + MARGIN, obj->value, h - (MARGIN << 1), 0);
+	fillRect(x + MARGIN, y + MARGIN, obj->value * 200/(obj->high - obj->low +1), h - (MARGIN << 1), 0);
 }
 
-void eraseContent(Content* obj) {
-	//TODO
-	
+int triangles(int x, int y) {
+	x = x % 40;
+	y = y % 40;
+	x = abs(20 - x);
+	return y >= 2 * x ? 1 : 0;
+}
+
+void plotBackground(void) {
+	setColor(25, 137, 100);
+	setColorBg(255, 255, 255);
+	drawShape(0, 0, 240, 320, &triangles);
+
+	return;
+}
+
+void eraseContent(Content* content) {
+	setColor(25, 137, 100);
+	setColorBg(255, 255, 255);
+	drawShape(content.x, content.y, content.w, content.h, &triangles);
 }
 
 void drawPage(Page* obj) {

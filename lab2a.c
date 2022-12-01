@@ -78,99 +78,49 @@ QState Final_on(FinalLab *me) {
 /******************************************************************/
 
 QState Final_main(FinalLab *me) {
-	return HSM_template(me, &page_main, &Final_on);
+	return HSM_template_button(me, &page_main, &Final_on);
 
 }
 
 QState Final_setting(FinalLab *me) {
-	switch (Q_SIG(me)) {
-	case Q_ENTRY_SIG: {
-		me->btn_index = 0;
-		// draw buttons
-		return Q_HANDLED();
-	}
-	case Q_EXIT_SIG: {
-		// erase buttons
-		return Q_HANDLED();
-	}
-	case Q_INIT_SIG: {
-		return Q_HANDLED();
-	}
-	case ENCODER_UP:	{
-	    //++FinalLab.frequency;
-		return Q_HANDLED();}
-	case ENCODER_DOWN:{
-	    //--FinalLab.frequency;
-		return Q_HANDLED();}
-	case BUTTON_LEFT:
-	case TICK: {
-		return Q_HANDLED();
-	}
-	case BUTTON_UP: {
-		if (me->btn_index > 0)
-			me->btn_index--;
-		return Q_HANDLED();
-	}
-	case BUTTON_DOWN: {
-		if (me->btn_index > 0)
-			me->btn_index++;
-		return Q_HANDLED();
-	}
-	case BUTTON_CENTER: {
-		// page logic
-
-	}
-	case ENCODER_CLICK:
-	case BUTTON_RIGHT: {
-		// page logic
-		return Q_HANDLED();
-	}
-	}
-
-	return Q_SUPER(&Final_on);
+	return HSM_template_slider(me, &page_cofig, &Final_main);
 
 }
+
+QState Final_pause(FinalLab *me){
+	return HSM_template_button(me, &page_pause, &Final_game);
+}
+
+QState Final_end(FinalLab *me){
+	return HSM_template_button(me, &page_end, &Final_game);
+}
+
+
 
 QState Final_debug(FinalLab *me) {
 	switch (Q_SIG(me)) {
 	case Q_ENTRY_SIG: {
-		me->btn_index = 0;
-		// draw buttons
+		// game logic initialization
 		return Q_HANDLED();
 	}
 	case Q_EXIT_SIG: {
-		// erase buttons
 		return Q_HANDLED();
 	}
 	case Q_INIT_SIG: {
-		return Q_HANDLED();
+		return Q_TRAN(&Final_gaming);
 	}
 	case ENCODER_UP:
 	case ENCODER_DOWN:
 	case BUTTON_LEFT:
-	case TICK: {
-		return Q_HANDLED();
-	}
-	case BUTTON_UP: {
-		if (me->btn_index > 0)
-			me->btn_index--;
-		return Q_HANDLED();
-	}
-	case BUTTON_DOWN: {
-		if (me->btn_index > 0)
-			me->btn_index++;
-		return Q_HANDLED();
-	}
-	case BUTTON_CENTER: {
-		// page logic
-	}
+	case TICK:
+	case BUTTON_UP:
+	case BUTTON_DOWN:
 	case ENCODER_CLICK:
-	case BUTTON_RIGHT: {
-		// page logic
+	case BUTTON_RIGHT:
+	case BUTTON_CENTER: {
 		return Q_HANDLED();
 	}
 	}
-
 	return Q_SUPER(&Final_on);
 
 }
@@ -214,8 +164,8 @@ QState Final_gaming(FinalLab *me) {
 	case Q_INIT_SIG: {
 		return Q_HANDLED();
 	}
-	case BUTTON_RIGHT: {
-		return Q_TRAN(&Final_main);
+	case BUTTON_LEFT: {
+		return Q_HANDLED();
 	}
 
 	case BUTTON_CENTER: {
@@ -223,7 +173,7 @@ QState Final_gaming(FinalLab *me) {
 	}
 	case ENCODER_UP:
 	case ENCODER_DOWN:
-	case BUTTON_LEFT:
+	case BUTTON_RIGHT:
 	case TICK:
 	case BUTTON_UP:
 	case BUTTON_DOWN:

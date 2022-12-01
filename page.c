@@ -57,7 +57,7 @@ void initText(Text* text, char* str, u8* font) {
 
 void initButton(Button* btn, char* str) {
 	btn->text = str;
-
+	u8* font = btn->super.font;///////////
 	u8 len = 0;
 	while (str[len] != '\0')
 		len++;
@@ -75,6 +75,8 @@ void initSlider(Slider* slider, char* str, u32 low, u32 high){
 	slider->text = str;
 	slider->low = low;
 	slider->high = high;
+
+	u8* font = btn->super.font;///////////
 
 	u32 text_w = ((u32)len) * ((u32)font[0]);
 	u32 text_h = font[1];
@@ -259,14 +261,14 @@ void initPageEnd() {
     arrange_btns(2, 120, 40, SmallFont, end_btn_arr);
     initColor(&end_btn_arr[0].super.bg, 255, 255, 255);
 	initColor(&end_btn_arr[0].super.fg, 0, 0, 0);
-    initButton(&end_btn_arr[0].text, "Restart", SmallFont);
+    initButton(&end_btn_arr[0].text, "Restart");
     initColor(&end_btn_arr[0].focus, 200, 200, 200);
     initColor(&end_btn_arr[0].press, 100, 100, 100);
     end_btn_arr[0].target = (QStateHandler) &Final_gaming;
 
     initColor(&end_btn_arr[1].super.bg, 255, 255, 255);
 	initColor(&end_btn_arr[1].super.fg, 0, 0, 0);
-    initButton(&end_btn_arr[1].text, "Exit", SmallFont);
+    initButton(&end_btn_arr[1].text, "Exit");
     initColor(&end_btn_arr[1].focus, 200, 200, 200);
     initColor(&end_btn_arr[1].press, 100, 100, 100);
     end_btn_arr[1].target = (QStateHandler) &Final_main;

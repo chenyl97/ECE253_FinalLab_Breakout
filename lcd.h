@@ -107,4 +107,6 @@ void setFont(u8* font);
 void printChar(u8 c, int x, int y);
 void lcdPrint(char *st, int x, int y);
 
+void drawShape(int x, int y, int w, int h, int (*func)(int x, int y));
+
 #endif /* LCD_H_ */

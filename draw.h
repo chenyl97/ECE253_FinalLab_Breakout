@@ -76,6 +76,10 @@ void eraseContent(Content* obj);
 void drawPage(Page* obj);
 void erasePage(Page* obj);
 
+int triangles(int x, int y);
+void plotBackground(void);
+void eraseContent(u8 contentNum, Content* contentArr)
+
 
 
 #endif

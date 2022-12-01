@@ -20,6 +20,7 @@
 #include "xspi.h"
 #include "xspi_l.h"
 #include "lcd.h"
+#include "page.h"
 
 /*****************************/
 
@@ -205,31 +206,40 @@ void DrawBorder() {
 	}
 }
 
-void AQUABLUE() {
+void AQUABLUE(u8 contNum, *Content contArr) {
 	clrScr();
-	for (int Row = 0; Row<8; Row++) {
-		int NewRow = Row*40;
-		for (int Col = 0; Col<6; Col++) {
-			int NewCol = Col*40;
-			if ((Row == 1 || Row == 2 || Row == 3) && (Col == 1 || Col == 2 || Col == 3 || Col == 4)) {
-				//Nothing
-			} else {
-			for (int y = 0; y<40; y++) {
-				int blue = 2*ceil(y/2);
-				setColor(0,255,255);
-				drawHLine(0+NewCol, y+NewRow, 20-(blue/2));
-				setColor(0, 0, 255);
-				drawHLine(20-(blue/2)+NewCol, y+NewRow, blue);
-				setColor(0,255,255);
-				drawHLine(20+(blue/2)+NewCol, y+NewRow, 20-(blue/2));
-			}
+	for (int i=0; i<contNum; i++){
+		x = contArr[i].x;
+		y = contArr[i].y;
+		w = contArr[i].w;
+		h = contArr[i].h;
+
+		for (int Row = 0; Row<8; Row++) {
+			int NewRow = Row*40;
+			for (int Col = 0; Col<6; Col++) {
+				int NewCol = Col*40;
+				/*if ((Row == 1 || Row == 2 || Row == 3) && (Col == 1 || Col == 2 || Col == 3 || Col == 4)) {
+					//Nothing
+				} else {*/
+				
+				for (int y = 0; y<40; y++) {
+					int blue = 2*ceil(y/2);
+					setColor(0,255,255);
+					drawHLine(0+NewCol, y+NewRow, 20-(blue/2));
+					setColor(0, 0, 255);
+					drawHLine(20-(blue/2)+NewCol, y+NewRow, blue);
+					setColor(0,255,255);
+					drawHLine(20+(blue/2)+NewCol, y+NewRow, 20-(blue/2));
+				}
+				
 			}
 		}
+	
 	}
-	setColor(0, 255, 0);
-	setColorBg(0, 0, 0);
-	setFont(BigFont);
-	lcdPrint("VOLUME", 73, 50);
+	//setColor(0, 255, 0);
+	//setColorBg(0, 0, 0);
+	//setFont(BigFont);
+	//lcdPrint("VOLUME", 73, 50);
 }
 
 void RETEXT() {

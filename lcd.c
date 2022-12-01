@@ -278,3 +278,17 @@ void lcdPrint(char *st, int x, int y) {
 	while (*st != '\0')
 		printChar(*st++, x + cfont.x_size * i++, y);
 }
+
+void drawShape(int x, int y, int w, int h, int (*func)(int x, int y)) {
+	int i, j, val;
+	setXY(x, y, x + w - 1, y + h - 1);
+	for (i = 0; i < h; i++) {
+		for (j = 0; j < w; j++) {
+			val = func(x + j, y + i);
+			if (val)
+				LCD_Write_DATA16(fch, fcl);
+			else
+				LCD_Write_DATA16(bch, bcl);
+		}
+	}
+}
