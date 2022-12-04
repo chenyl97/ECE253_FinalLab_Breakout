@@ -1,7 +1,8 @@
 #include "page.h"
-#include "lab2a.h"
-#include "lcd.h"
-#include "draw.h"
+
+#include "draw/draw.h"
+#include "hardware/lcd.h"
+#include "HSM/lab2a.h"
 
 
 #define SCREEN_WIDTH 240

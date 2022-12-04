@@ -7,7 +7,8 @@
 #define SRC_PAGES_H_
 
 #include "xil_types.h"
-#include "lab2a.h"
+
+#include "HSM/lab2a.h"
 
 
 typedef struct ColorTag {

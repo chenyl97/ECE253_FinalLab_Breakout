@@ -3,10 +3,10 @@
 * Date of the Last Update:  November 1,2020
 *****************************************************************************/
 
-#include "qpn_port.h"                                       /* QP-nano port */
-#include "bsp.h"                             /* Board Support Package (BSP) */
-#include "lab2a.h"                               /* application interface */
 #include "xil_cache.h"		                /* Cache Drivers */
+#include "hardware/bsp.h"                             /* Board Support Package (BSP) */
+#include "HSM/lab2a.h"                               /* application interface */
+#include "HSM/qpn_port.h"                                       /* QP-nano port */
 
 
 static QEvent l_lab2aQueue[30];  

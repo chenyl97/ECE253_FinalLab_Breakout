@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <math.h>
-#include "bsp.h"
-#include "lcd.h"
 #include "game.h"
 #include <stdbool.h>
-#include "qpn_port.h"
-#include "lab2a.h"
+
+#include "hardware/bsp.h"
+#include "hardware/lcd.h"
+#include "HSM/lab2a.h"
+#include "HSM/qpn_port.h"
 
 float paddle_x;
 float paddle_length;

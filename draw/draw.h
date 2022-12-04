@@ -1,8 +1,8 @@
 #ifndef SRC_LCD_DRAW_H_
 #define SRC_LCD_DRAW_H_
 
-#include "lab2a.h"
-#include "page.h"
+#include "../HSM/lab2a.h"
+#include "../page.h"
 
 #define MARGIN 1
 

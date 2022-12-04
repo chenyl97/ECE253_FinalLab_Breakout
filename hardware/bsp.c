@@ -4,11 +4,8 @@
  *****************************************************************************/
 
 /**/
-#include "qpn_port.h"
 #include "bsp.h"
-#include "lab2a.h"
-#include "lcd.h"
-#include "draw.h"
+
 #include "xil_exception.h"
 #include "xparameters.h" //contains hardware addresses and bit masks
 #include "xil_printf.h" // used for xil_printf()
@@ -18,6 +15,11 @@
 #include "xtmrctr.h" // timer drivers
 #include "xtmrctr_l.h" // low-level timer drivers
 #include "xgpio.h" // used for general purpose I/O
+
+#include "../draw/draw.h"
+#include "../HSM/lab2a.h"
+#include "../HSM/qpn_port.h"
+#include "lcd.h"
 
 /*****************************/
 

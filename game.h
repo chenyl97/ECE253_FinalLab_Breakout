@@ -6,9 +6,9 @@
  */
 #include <stdio.h>
 #include <math.h>
-#include "bsp.h"
-#include "lcd.h"
 #include <stdbool.h>
+#include "hardware/bsp.h"
+#include "hardware/lcd.h"
 
 #define BRICK_LENGTH 23
 #define BRICK_WIDTH 8
@@ -47,5 +47,15 @@ struct Brick
 	bool brick_hit;
 	bool brick_drawn;
 };
+
+typedef struct PaddleTag {
+
+	float x;
+	float legnth;
+	u8 direction;
+	u32 speed;
+}Paddle;
+
+
 
 #endif /* SRC_GAME_H_ */
