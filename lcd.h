@@ -101,7 +101,7 @@ void clrXY(void);
 void clrScr(void);
 
 void drawHLine(int x, int y, int l);
-void fillRect(int x1, int y1, int x2, int y2);
+void fillRect(int x1, int y1, int x2, int y2, int margin);
 
 void setFont(u8* font);
 void printChar(u8 c, int x, int y);

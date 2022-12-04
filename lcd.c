@@ -73,6 +73,17 @@ void LCD_Write_DATA(char VL) {
 	Xil_Out32(SPI_IISR, Xil_In32(SPI_IISR) | XSP_INTR_TX_EMPTY_MASK);
 }
 
+// Write 16-bit data to LCD controller
+void LCD_Write_DATA16(char VH, char VL) {
+	Xil_Out32(SPI_DC, 0x01);
+	Xil_Out32(SPI_DTR, VH);
+	Xil_Out32(SPI_DTR, VL);
+
+	while (0 == (Xil_In32(SPI_IISR) & XSP_INTR_TX_EMPTY_MASK))
+		;
+	Xil_Out32(SPI_IISR, Xil_In32(SPI_IISR) | XSP_INTR_TX_EMPTY_MASK);
+}
+
 // Initialize LCD controller
 void initLCD(void) {
 	int i;
@@ -196,7 +207,7 @@ void clrScr(void) {
 	// Black screen
 	setColor(0, 0, 0);
 
-	fillRect(0, 0, DISP_X_SIZE, DISP_Y_SIZE);
+	fillRect(0, 0, DISP_X_SIZE, DISP_Y_SIZE, 0);
 }
 
 // Draw horizontal line
@@ -222,8 +233,8 @@ void fillRect(int x, int y, int w, int h, int margin) {
 	int i, m;
 
 	setXY(x, y, x + w - 1, y + h - 1);
-	for (i = 0; i < w; i++)
-		for (m = 0; m < h; m++) {
+	for (m = 0; m < h; m++)
+		for (i = 0; i < w; i++) {
 			if (i < margin || i >= w - margin || m < margin
 					|| m >= h - margin) {
 				LCD_Write_DATA(fch);
@@ -236,7 +247,6 @@ void fillRect(int x, int y, int w, int h, int margin) {
 
 	clrXY();
 }
-
 
 // Select the font used by print() and printChar()
 void setFont(u8* font) {

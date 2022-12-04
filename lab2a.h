@@ -22,7 +22,7 @@ enum FinalLabSignals {
 typedef struct FinalLabTag {               //Lab2A State machine
 	QActive super;
 	u32 btn_index;
-	unsigned int fequency;
+	//unsigned int fequency;
 } FinalLab;
 
 /* Setup state machines */

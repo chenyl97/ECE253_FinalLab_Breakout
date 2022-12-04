@@ -1,10 +1,11 @@
 #include "page.h"
 #include "lab2a.h"
 #include "lcd.h"
-#include "hsm.h"
+#include "draw.h"
 
-#define SCREEN_WIDTH 320
-#define SCREEN_HEIGHT 240
+
+#define SCREEN_WIDTH 240
+#define SCREEN_HEIGHT 320
 
 static Text main_text_arr[2];
 static Button main_btn_arr[3];
@@ -12,9 +13,9 @@ static Text config_text_arr[4];
 static Slider config_slider_arr[3];
 static Button config_back_btn;
 
-static Text pause_text_arr;
+static Text pause_text_arr[1];
 static Button pause_btn_arr[2];
-static Text end_text_arr;
+static Text end_text_arr[1];
 static Button end_btn_arr[2];
 
 Page page_main;
@@ -38,7 +39,7 @@ void initContent(Content* obj, u32 x, u32 y, u32 w, u32 h, u8* font) {
 	obj->h = h;
 }
 
-void initText(Text* text, char* str, u8* font) {
+void initText(Text* text, char* str, u8* font, int margin) {
 	text->text = str;
 	text->super.font = font;
 
@@ -46,18 +47,19 @@ void initText(Text* text, char* str, u8* font) {
 	while (str[len] != '\0')
 		len++;
 	text->length = len - 1;
+	text->margin = margin;
 
 	u32 text_w = ((u32)len) * ((u32)font[0]);
-	u32 text_h = font[1];
+	u32 text_h = (u32)font[1];
 
 	text->text_x = ((text->super.w - text_w) >> 1) + text->super.x;
-	text->text_x = ((text->super.h - text_h) >> 1) + text->super.y;
+	text->text_y = ((text->super.h - text_h) >> 1) + text->super.y;
 
 }
 
 void initButton(Button* btn, char* str) {
 	btn->text = str;
-	u8* font = btn->super.font;///////////
+	u8* font = btn->super.font;
 	u8 len = 0;
 	while (str[len] != '\0')
 		len++;
@@ -68,7 +70,8 @@ void initButton(Button* btn, char* str) {
 
 	btn->text_x = ((btn->super.w - text_w) >> 1) + btn->super.x;
 	btn->text_y = ((btn->super.h - text_h) >> 1) + btn->super.y;
-
+	initColor(&btn->focus, 30,10,10);
+	initColor(&btn->press, 50,30,30);
 }
 
 void initSlider(Slider* slider, char* str, u32 low, u32 high){
@@ -76,23 +79,30 @@ void initSlider(Slider* slider, char* str, u32 low, u32 high){
 	slider->low = low;
 	slider->high = high;
 
-	u8* font = btn->super.font;///////////
+	u8 len = 0;
+	while (str[len] != '\0')
+		len++;
+	slider->length = len - 1;
+
+	u8* font = slider->super.font;
 
 	u32 text_w = ((u32)len) * ((u32)font[0]);
 	u32 text_h = font[1];
 
 	slider->value = (u32) ((high+low) >> 1);
+	slider->pre_value = (u32) ((high+low) >> 1);
 	
 	slider->text_x = ((slider->super.w - text_w) >> 1) + slider->super.x;
-	slider->text_y = ((slider->super.h - text_h) >> 1) + slider->super.y + 10;
+	slider->text_y = slider->super.h + slider->super.y + 10;
+	slider->total_h = slider->super.h + text_h + 10;
 }
 
 void arrange_btns(u8 content_num, u32 w, u32 h, u8* font, Button* BtnArr) {
 	u32 margin; 
-	margin = (SCREEN_HEIGHT-80-h*content_num)/content_num;
+	margin = (SCREEN_HEIGHT-80-(h*content_num))/(content_num+1);
 	for (int i=0; i<content_num; i++) {
 		BtnArr[i].super.x = ((SCREEN_WIDTH-w) >> 1);
-		BtnArr[i].super.y = ((SCREEN_HEIGHT-h) >> 1) + i*(margin+h);
+		BtnArr[i].super.y = 80 + i*(margin+h) + margin;
 		BtnArr[i].super.w = w;
 		BtnArr[i].super.h = h;
 		BtnArr[i].super.font = font;
@@ -102,14 +112,15 @@ void arrange_btns(u8 content_num, u32 w, u32 h, u8* font, Button* BtnArr) {
 void arrange_sliders(u8 content_num, u32 w, u32 h, u8* font, Slider* SliderArr) {
 	u32 margin; 
 
+	u32 len = SliderArr->length;
 	u32 text_w = ((u32)len) * ((u32)font[0]);
 	u32 text_h = font[1];
 
-	margin = (SCREEN_HEIGHT-80-(h+text_h+10)*content_num)/content_num;
+	margin = (SCREEN_HEIGHT- 80 -((h+text_h+10)*content_num))/(content_num+1);
 
 	for (int i=0; i<content_num; i++) {
 		SliderArr[i].super.x = ((SCREEN_WIDTH-w) >> 1);
-		SliderArr[i].super.y = ((SCREEN_HEIGHT-h) >> 1) + i*(margin+h+text_h+10);
+		SliderArr[i].super.y = 80 + i*(margin+h+text_h+10) + margin;
 		SliderArr[i].super.w = w;
 		SliderArr[i].super.h = h;
 		SliderArr[i].super.font = font;
@@ -135,35 +146,35 @@ void arrange_sliders(u8 content_num, u32 w, u32 h, u8* font, Slider* SliderArr) 
 void initPageMain() {
 	page_main.canGoBack = 0;
 	page_main.textCount = 2;
-	page_main.buttonCount = 3;
+	page_main.buttonCount = 2;
 	page_main.index = 0;
 
 	
-	initContent(&main_text_arr[0].super, 20, 10, 200, 50);
+	initContent(&main_text_arr[0].super, 0, 10, 240, 50, BigFont);
     initColor(&main_text_arr[0].super.bg, 255, 255, 255);
 	initColor(&main_text_arr[0].super.fg, 0, 0, 0);
-    initText(&main_text_arr[0].text, "BREAKOUT", BigFont);
+    initText(&main_text_arr[0], "BREAKOUT", BigFont, 5);
 
-    initContent(&main_text_arr[1].super, 20, 50, 200, 30);
+    initContent(&main_text_arr[1].super, 0, 50, 240, 30, SmallFont);
     initColor(&main_text_arr[1].super.bg, 255, 255, 255);
 	initColor(&main_text_arr[1].super.fg, 0, 0, 0);
-    initText(&main_text_arr[1].text, "by Yiliang and Shang-Hsun", SmallFont);
+    initText(&main_text_arr[1], "by Yiliang and Shang-Hsun", SmallFont, 5);
     
 
     // BTN
-    arrange_btns(3, 120, 30, SmallFont ,main_btn_arr);
+    arrange_btns(2, 120, 30, SmallFont ,main_btn_arr);
 	initColor(&main_btn_arr[0].super.bg, 255, 255, 255);
 	initColor(&main_btn_arr[0].super.fg, 0, 0, 0);
-    initButton(&main_btn_arr[0].text, "Start Game");
-    initColor(&main_btn_arr[0].focus, 200, 200, 200);
-    initColor(&main_btn_arr[0].press, 100, 100, 100);
+    initButton(&main_btn_arr[0], "Start Game");
+    initColor(&main_btn_arr[0].focus, 0xff, 0, 0);
+    initColor(&main_btn_arr[0].press, 100, 0, 0);
     main_btn_arr[0].target = (QStateHandler) &Final_game;
 
     initColor(&main_btn_arr[1].super.bg, 255, 255, 255);
 	initColor(&main_btn_arr[1].super.fg, 0, 0, 0);
-    initButton(&main_btn_arr[1].text, "Setting");
-    initColor(&main_btn_arr[1].focus, 200, 200, 200);
-    initColor(&main_btn_arr[1].press, 100, 100, 100);
+    initButton(&main_btn_arr[1], "Setting");
+    initColor(&main_btn_arr[1].focus, 0xff, 0, 0);
+    initColor(&main_btn_arr[1].press, 100, 0, 0);
     main_btn_arr[1].target = (QStateHandler) &Final_setting;
 
     page_main.textArr = main_text_arr;
@@ -177,33 +188,36 @@ void initPageConfig() {
 	page_config.sliderCount = 3;
 	page_config.index = 0;
 
-	initContent(&config_text_arr[0].super, 20, 10, 200, 50);
+	initContent(&config_text_arr[0].super, 20, 10, 200, 80, BigFont);
     initColor(&config_text_arr[0].super.bg, 255, 255, 255);
 	initColor(&config_text_arr[0].super.fg, 0, 0, 0);
-    initText(&config_text_arr[0].text, "Setting", BigFont);
+    initText(&config_text_arr[0], "Setting", BigFont, 5);
     
     // slide bar
-	arrange_sliders(3, 120, 30, SmallFont, config_slider_arr)
+	arrange_sliders(3, 120, 30, SmallFont, config_slider_arr);
     initColor(&config_slider_arr[0].super.bg, 255, 255, 255);
 	initColor(&config_slider_arr[0].super.fg, 0, 0, 0);
+	initColor(&config_slider_arr[0].bar , 100, 0, 0);
     initSlider(&config_slider_arr[0], "Ball Speed", 1, 5);
-	initColor(&config_slider_arr[0].focus, 200, 200, 200);
+	initColor(&config_slider_arr[0].focus,  0xff, 0, 0);
 
     initColor(&config_slider_arr[1].super.bg, 255, 255, 255);
 	initColor(&config_slider_arr[1].super.fg, 0, 0, 0);
+	initColor(&config_slider_arr[1].bar , 100, 0, 0);
     initSlider(&config_slider_arr[1], "Paddle Speed", 1, 5);
-	initColor(&config_slider_arr[1].focus, 200, 200, 200);
+	initColor(&config_slider_arr[1].focus,  0xff, 0, 0);
 
-    initColor(&config_slider_arr[1].super.bg, 255, 255, 255);
-	initColor(&config_slider_arr[1].super.fg, 0, 0, 0);
-    initSlider(&config_slider_arr[1], "Paddle Lengh", 1, 5);
-	initColor(&config_slider_arr[1].focus, 200, 200, 200);
+    initColor(&config_slider_arr[2].super.bg, 255, 255, 255);
+	initColor(&config_slider_arr[2].super.fg, 0, 0, 0);
+	initColor(&config_slider_arr[2].bar , 100, 0, 0);
+    initSlider(&config_slider_arr[2], "Paddle Length", 1, 5);
+	initColor(&config_slider_arr[2].focus,  0xff, 0, 0);
 
 	//back button
-	initContent(&config_back_btn.super, 20, 10, 50, 50);
+	initContent(&config_back_btn.super, 20, 10, 50, 50, BigFont);
     initColor(&config_back_btn.super.bg, 255, 255, 255);
 	initColor(&config_back_btn.super.fg, 0, 0, 0);
-    initButton(&config_back_btn.text, "<");
+    initButton(&config_back_btn, "<");
     initColor(&config_back_btn.focus, 200, 200, 200);
     initColor(&config_back_btn.press, 100, 100, 100);
 	config_back_btn.super.font = BigFont;
@@ -220,23 +234,23 @@ void initPagePause() {
 	page_pause.buttonCount = 2;
 	page_pause.index = 0;
 	
-	initContent(&pause_text_arr.super, 20, 10, 200, 50);
-    initColor(&pause_text_arr.super.bg, 255, 255, 255);
-	initColor(&pause_text_arr.super.fg, 0, 0, 0);
-    initText(&pause_text_arr.text, "Pause", BigFont);
+	initContent(&pause_text_arr[0].super, 20, 10, 200, 50, BigFont);
+    initColor(&pause_text_arr[0].super.bg, 255, 255, 255);
+	initColor(&pause_text_arr[0].super.fg, 0, 0, 0);
+    initText(&pause_text_arr[0], "Pause", BigFont, 5);
     
     // BTN
     arrange_btns(2, 120, 40, SmallFont, pause_btn_arr);
     initColor(&pause_btn_arr[0].super.bg, 255, 255, 255);
 	initColor(&pause_btn_arr[0].super.fg, 0, 0, 0);
-    initButton(&pause_btn_arr[0].text, "Resume");
+    initButton(&pause_btn_arr[0], "Resume");
     initColor(&pause_btn_arr[0].focus, 200, 200, 200);
     initColor(&pause_btn_arr[0].press, 100, 100, 100);
     pause_btn_arr[0].target = (QStateHandler) &Final_gaming;
 
     initColor(&pause_btn_arr[1].super.bg, 255, 255, 255);
 	initColor(&pause_btn_arr[1].super.fg, 0, 0, 0);
-    initButton(&pause_btn_arr[1].text, "Exit");
+    initButton(&pause_btn_arr[1], "Exit");
     initColor(&pause_btn_arr[1].focus, 200, 200, 200);
     initColor(&pause_btn_arr[1].press, 100, 100, 100);
     pause_btn_arr[1].target = (QStateHandler) &Final_main;
@@ -252,23 +266,23 @@ void initPageEnd() {
 	page_end.buttonCount = 2;
 	page_end.index = 0;    
 	
-	initContent(&end_text_arr.super, 20, 10, 200, 50);
-    initColor(&end_text_arr.super.bg, 255, 255, 255);
-	initColor(&end_text_arr.super.fg, 0, 0, 0);
-    initText(&end_text_arr.text, "Pause", BigFont);
+	initContent(&end_text_arr[0].super, 20, 10, 200, 50, BigFont);
+    initColor(&end_text_arr[0].super.bg, 255, 255, 255);
+	initColor(&end_text_arr[0].super.fg, 0, 0, 0);
+    initText(&end_text_arr[0], "End", BigFont, 5);
     
     // BTN
     arrange_btns(2, 120, 40, SmallFont, end_btn_arr);
     initColor(&end_btn_arr[0].super.bg, 255, 255, 255);
 	initColor(&end_btn_arr[0].super.fg, 0, 0, 0);
-    initButton(&end_btn_arr[0].text, "Restart");
+    initButton(&end_btn_arr[0], "Restart");
     initColor(&end_btn_arr[0].focus, 200, 200, 200);
     initColor(&end_btn_arr[0].press, 100, 100, 100);
     end_btn_arr[0].target = (QStateHandler) &Final_gaming;
 
     initColor(&end_btn_arr[1].super.bg, 255, 255, 255);
 	initColor(&end_btn_arr[1].super.fg, 0, 0, 0);
-    initButton(&end_btn_arr[1].text, "Exit");
+    initButton(&end_btn_arr[1], "Exit");
     initColor(&end_btn_arr[1].focus, 200, 200, 200);
     initColor(&end_btn_arr[1].press, 100, 100, 100);
     end_btn_arr[1].target = (QStateHandler) &Final_main;
@@ -291,7 +305,7 @@ void initAllPages() {
 	initPageEnd();
 }
 
-QState HSM_template_BTN(FinalLab *me, Page* page, void* parent) {
+QState HSM_template_button(FinalLab *me, Page* page, void* parent) {
 	switch (Q_SIG(me)) {
 		case Q_ENTRY_SIG: {
 			page->index = 0;
@@ -313,22 +327,27 @@ QState HSM_template_BTN(FinalLab *me, Page* page, void* parent) {
 			return Q_HANDLED();
 		}
 		case BUTTON_UP: {
-			if (page->index > 0)
+			if (page->index > 0){
 				page->index--;
+			}
+			//xil_printf("btn_up\n\r");
 			drawPage(page);
 			return Q_HANDLED();
 		}
 		case BUTTON_DOWN: {
-			if (page->index < page->buttonCount - 1)
+			if (page->index < page->buttonCount - 1) {
 				page->index++;
+			}
 			drawPage(page);
 			return Q_HANDLED();
 		}
 		case BUTTON_CENTER: {
+			erasePage(page);
 			return Q_TRAN(page->buttonArr[page->index].target);
 		}
 
 		case BUTTON_LEFT: {
+			erasePage(page);
 			return Q_TRAN(&Final_main);
 		}
 	}
@@ -341,6 +360,7 @@ QState HSM_template_slider(FinalLab *me, Page* page, void* parent) {
 		case Q_ENTRY_SIG: {
 			page->index = 0;
 			drawPage(page);
+			//xil_printf("entry of mainpage\n\r");
 			return Q_HANDLED();
 		}
 		case Q_EXIT_SIG: {
@@ -357,29 +377,39 @@ QState HSM_template_slider(FinalLab *me, Page* page, void* parent) {
 			return Q_HANDLED();
 		}
 		case BUTTON_UP: {
-			if (page->index > 0)
+			if (page->index > 0) {
 				page->index--;
+			}
 			drawPage(page);
 			return Q_HANDLED();
 		}
 		case BUTTON_DOWN: {
-			if (page->index < page->sliderCount - 1)
+			if (page->index < page->sliderCount - 1) {
 				page->index++;
+			}
 			drawPage(page);
 			return Q_HANDLED();
 		}
 		case BUTTON_LEFT: {
+			erasePage(page);
 			return Q_TRAN(&Final_main);
 		}
 
 		case ENCODER_UP:{
-			if (page->sliderArr[page->index] < page->sliderArr[page->index].high)
-				page->sliderArr[page->index]++;
+			if (page->sliderArr[page->index].value < page->sliderArr[page->index].high) {
+				page->sliderArr[page->index].pre_value = page->sliderArr[page->index].value;
+				page->sliderArr[page->index].value++;
+				drawSlider(&page->sliderArr[page->index], 1);
+			}
+
 			return Q_HANDLED();
 		}
 		case ENCODER_DOWN:{
-			if (page->sliderArr[page->index] > page->sliderArr[page->index].low)
-				page->sliderArr[page->index]--;
+			if (page->sliderArr[page->index].value > page->sliderArr[page->index].low) {
+				page->sliderArr[page->index].pre_value = page->sliderArr[page->index].value;
+				page->sliderArr[page->index].value--;
+				drawSlider(&page->sliderArr[page->index], 1);
+			}
 			return Q_HANDLED();
 		}
 	}

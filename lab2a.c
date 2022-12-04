@@ -18,9 +18,10 @@
 #include <math.h>
 
 
+
 int act_position = START_POSITION;//
 int board_v = DEFAULT_BOARD_V;//
-int ball_v = DEFAULT_BALL_V//
+int ball_v = DEFAULT_BALL_V;//
 int difficulty = DEFAULT_DIFFICULTY;//
 
 int stored_value = 0;
@@ -83,7 +84,7 @@ QState Final_main(FinalLab *me) {
 }
 
 QState Final_setting(FinalLab *me) {
-	return HSM_template_slider(me, &page_cofig, &Final_main);
+	return HSM_template_slider(me, &page_config, &Final_main);
 
 }
 

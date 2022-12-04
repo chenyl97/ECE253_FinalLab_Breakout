@@ -32,6 +32,7 @@ typedef struct TextTag {
     u8 length;
     u32 text_x;
     u32 text_y;
+    int margin;
 } Text;
 
 typedef struct ButtonTag {
@@ -48,12 +49,16 @@ typedef struct ButtonTag {
 typedef struct SliderTag {
 	Content super;
     char* text;
+    u8 length;
 	u32 low;
 	u32 high;
 	u32 value;
+	u32 pre_value;
     u32 text_x;
     u32 text_y;
+    u32 total_h;
     Color focus;
+    Color bar;
 } Slider;
 
 typedef struct PageTag {
@@ -69,7 +74,7 @@ typedef struct PageTag {
 } Page;
 
 extern Page page_main;
-extern Page page_cofig;
+extern Page page_config;
 extern Page page_debug;
 extern Page page_pause;
 extern Page page_end;
