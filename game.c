@@ -25,9 +25,8 @@ bool going_right;
 void init_paddle(Paddle* obj) {
 	initColor(&obj->super.fg, 255, 255, 255);
 	initColor(&obj->super.bg, 255, 255, 255);
-	obj->direction = 0;
-	obj->speed = STOP;
-	obj->super.y = SCREEN_HEIGHT - 20;
+	obj->direction = STOP;
+	obj->super.y = SCREEN_HEIGHT - 30;
 	obj->super.h = 10;
 
 	switch (PADDLE_LENGTH)
@@ -67,7 +66,7 @@ void init_paddle(Paddle* obj) {
 	}
 	
 	obj->x_max = SCREEN_WIDTH - obj->super.w;
-	obj->super.x = (u32) (obj->x_max >> 2);
+	obj->super.x = (u32) (obj->x_max >> 1);
 }
 
 /*************************Method to draw the paddle on the screen*************************/
@@ -99,12 +98,19 @@ void paddle_draw(Paddle* paddle)
 }
 
 /*************************Method to make the paddle move*************************/
-void paddle_move(Paddle* obj, u8 dir)
+void paddle_move(Paddle* obj, int dir)
 {
 	obj->direction = dir;
-	if ((obj->super.x - obj->speed >= 0) & (obj->super.x + obj->speed <= obj->x_max)) {
+	if ((obj->super.x >= obj->speed) & (obj->super.x + obj->speed < obj->x_max)) {
 		obj->super.x += obj->direction * obj->speed;
 	}
+	else if ((obj->super.x < obj->speed)) {
+		obj->super.x = (dir==LEFT) ? 0 : (obj->super.x + obj->speed);
+	}
+	else if ((obj->super.x + obj->speed >= obj->x_max)) {
+		obj->super.x = (dir==RIGHT) ? obj->x_max : (obj->super.x - obj->speed);
+	}
+
 }
 
 /*
@@ -423,7 +429,7 @@ void check_points()
 void new_game()
 {
 	ball_draw(120,120);					//displays the ball
-	paddle_draw(120);						//displays the paddle
+	//paddle_draw(120);						//displays the paddle
 	for(int i=0; i<30; i++)
 	{//displays the bricks (if modified)
 		int x=0;

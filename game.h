@@ -40,8 +40,8 @@
 #define BALL_MAX_SPEED 2
 #define BACKGROUND_COLOUR Black
 
-#define SCREEN_WIDTH 320
-#define SCREEN_HEIGHT 240
+#define SCREEN_WIDTH 240
+#define SCREEN_HEIGHT 320
 #ifndef SRC_GAME_H_
 #define SRC_GAME_H_
 
@@ -55,7 +55,7 @@ struct Brick
 
 typedef struct PaddleTag {
 	Content super;
-	u8 direction;
+	int direction;
 	u32 speed;
 	u32 x_max;
 }Paddle;
@@ -64,7 +64,7 @@ extern Paddle paddle;
 
 void init_paddle(Paddle* obj);
 void paddle_draw(Paddle* paddle);
-void paddle_move(Paddle* obj, u8 dir);
+void paddle_move(Paddle* obj, int dir);
 void init_game();
 
 #endif /* SRC_GAME_H_ */

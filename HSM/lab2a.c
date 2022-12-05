@@ -116,6 +116,7 @@ QState Final_game(FinalLab *me) {
 		}
 		case Q_INIT_SIG: {
 			init_game();
+			paddle_draw(&paddle);
 			return Q_TRAN(&Final_gaming);
 		}
 		case BUTTON_LEFT:
