@@ -9,6 +9,8 @@
 #include <stdbool.h>
 #include "hardware/bsp.h"
 #include "hardware/lcd.h"
+#include "draw/draw.h"
+#include "page.h"
 
 #define BRICK_LENGTH 23
 #define BRICK_WIDTH 8
@@ -24,9 +26,12 @@
 #define PADDLE_WIDTH 10
 #define PADDLE_COLOUR White
 #define PADDLE_ANGLE 0.1 //10% of the paddle
-#define PADDLE_EASY 60
-#define PADDLE_MEDIUM 40
-#define PADDLE_HARD 20
+#define PADDLE_L_EASY 60
+#define PADDLE_L_MEDIUM 40
+#define PADDLE_L_HARD 20
+#define PADDLE_V_LOW 5
+#define PADDLE_V_MEDIUM 10
+#define PADDLE_V_HIGH 20
 #define INCREMENT_BALL_SPEED 1.2
 #define DECREMENT_BALL_SPEED 0.8
 
@@ -49,13 +54,17 @@ struct Brick
 };
 
 typedef struct PaddleTag {
-
-	float x;
-	float legnth;
+	Content super;
 	u8 direction;
 	u32 speed;
+	u32 x_max;
 }Paddle;
 
+extern Paddle paddle;
 
+void init_paddle(Paddle* obj);
+void paddle_draw(Paddle* paddle);
+void paddle_move(Paddle* obj, u8 dir);
+void init_game();
 
 #endif /* SRC_GAME_H_ */

@@ -7,6 +7,8 @@
 #define lab2a_h
 #include "qpn_port.h"
 
+
+
 enum FinalLabSignals {
 	ENCODER_UP = Q_USER_SIG,
 	ENCODER_DOWN,
@@ -22,7 +24,6 @@ enum FinalLabSignals {
 typedef struct FinalLabTag {               //Lab2A State machine
 	QActive super;
 	u32 btn_index;
-	//unsigned int fequency;
 } FinalLab;
 
 /* Setup state machines */

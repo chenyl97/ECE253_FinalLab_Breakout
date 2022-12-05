@@ -81,6 +81,7 @@ extern Page page_pause;
 extern Page page_end;
 
 void initAllPages();
+void initColor(Color* color, u8 r, u8 g, u8 b);
 QState HSM_template_button(FinalLab *me, Page* page, void* parent);
 QState HSM_template_slider(FinalLab *me, Page* page, void* parent);
 

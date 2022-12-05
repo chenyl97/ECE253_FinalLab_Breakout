@@ -52,6 +52,7 @@ void drawSlider(Slider* obj, u32 focused) {
 	u32 w = obj->super.w;
 	u32 h = obj->super.h;
 
+
 	if ((obj->pre_value > obj->value) & focused) {
 		// text color
 		Color* fg = focused ? &obj->focus : &obj->super.fg;

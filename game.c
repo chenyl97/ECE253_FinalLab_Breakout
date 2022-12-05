@@ -8,71 +8,106 @@
 #include "HSM/lab2a.h"
 #include "HSM/qpn_port.h"
 
+#define BALL_SPEED page_config.sliderArr[0].value
+#define PADDLE_SPEED page_config.sliderArr[1].value
+#define PADDLE_LENGTH page_config.sliderArr[2].value
+#define LEFT -1
+#define RIGHT 1
+#define STOP 0
+
+Paddle paddle;
 float paddle_x;
 float paddle_length;
-float PADDLE_SPEED = 1.5;
 bool going_left;
 bool going_right;
 
+
+void init_paddle(Paddle* obj) {
+	initColor(&obj->super.fg, 255, 255, 255);
+	initColor(&obj->super.bg, 255, 255, 255);
+	obj->direction = 0;
+	obj->speed = STOP;
+	obj->super.y = SCREEN_HEIGHT - 20;
+	obj->super.h = 10;
+
+	switch (PADDLE_LENGTH)
+	{
+	case 1:
+		obj->super.w = PADDLE_L_EASY;
+		break;
+	
+	case 2:
+		obj->super.w = PADDLE_L_MEDIUM;
+		break;
+	
+	case 3:
+		obj->super.w = PADDLE_L_HARD;
+		break;
+	default:
+		obj->super.w = PADDLE_L_MEDIUM;
+		break;
+	}
+
+	switch (PADDLE_SPEED)
+	{
+	case 1:
+		obj->speed = PADDLE_V_LOW;
+		break;
+	
+	case 2:
+		obj->speed = PADDLE_V_MEDIUM;
+		break;
+	
+	case 3:
+		obj->speed = PADDLE_V_HIGH;
+		break;
+	default:
+		obj->speed = PADDLE_V_MEDIUM;
+		break;
+	}
+	
+	obj->x_max = SCREEN_WIDTH - obj->super.w;
+	obj->super.x = (u32) (obj->x_max >> 2);
+}
+
 /*************************Method to draw the paddle on the screen*************************/
-void paddle_draw(float x)
+void paddle_draw(Paddle* paddle)
 {
-	//GLCD_DrawRect(PADDLE_Y,x_drawn,PADDLE_WIDTH,length,BACKGROUND_COLOUR);	//cancels the paddle of the previous cycle		
-	setColor(0,120,0);
-	//drawHLine(x-20, 10, 40);
-	fillRect(x,10,40,10,1);
-	//GLCD_DrawRect(PADDLE_Y,x,PADDLE_WIDTH,length,PADDLE_COLOUR);		//displays the paddle after its movement
-	setColor(0,255,0);
-	//drawHLine(x-20, 10, 40);
-	fillRect(x,10,40,10,1);
+	xil_printf("%i,%i,%i,%i\n\r", paddle->super.x,paddle->super.y,paddle->super.w,paddle->super.h);
+	if (paddle->direction == LEFT) {
+		//draw new step
+		setColors(&paddle->super.fg, &paddle->super.bg);
+		fillRect(paddle->super.x, paddle->super.y, paddle->speed, paddle->super.h, 0);
+		//erase previous step
+		setColor(0, 0, 95);
+		setColorBg(0, 0, 0);
+		drawShape(paddle->super.x + paddle->super.w, paddle->super.y, paddle->speed, paddle->super.h, &triangles);	
+	}
+	else if (paddle->direction == RIGHT) {
+		//draw new step
+		setColors(&paddle->super.fg, &paddle->super.bg);
+		fillRect(paddle->super.x + paddle->super.w - paddle->speed, paddle->super.y, paddle->speed, paddle->super.h, 0);
+		//erase previous step
+		setColor(0, 0, 95);
+		setColorBg(0, 0, 0);
+		drawShape(paddle->super.x - paddle->speed, paddle->super.y, paddle->speed, paddle->super.h, &triangles);
+	}
+	else {
+		setColors(&paddle->super.fg, &paddle->super.bg);
+		fillContent(&paddle->super, 0);
+	}
 }
 
 /*************************Method to make the paddle move*************************/
-void paddle_move(bool direction_left,bool direction_right,int x_ball)
+void paddle_move(Paddle* obj, u8 dir)
 {
-	if(x_ball!=-1)
-	{//automatic mode
-		paddle_x = x_ball;
-		if (paddle_x <= 0)
-			paddle_x = 0;
-		else if (paddle_x+paddle_length > SCREEN_HEIGHT)
-			paddle_x = SCREEN_HEIGHT-paddle_length;
-	}
-	if (direction_left == 1 && direction_right == 0)
-	{//means left click
-		if (paddle_x <= 0){				//paddle has reached the left side of the screen...do nothing instead of moving the paddle
-			going_left = false;
-			going_right = false;
-			paddle_x = 0;
-		}
-		else{		
-			going_left = true;
-			going_right = false;
-			paddle_x -= PADDLE_SPEED;//*0.65;		//GPIO read problem, coefficient to fix it
-		}
-	}
-	else if (direction_left == 0 && direction_right == 1)
-	{//means right click
-		if (paddle_x + paddle_length >= SCREEN_HEIGHT)
-		{				//paddle has reached the right side of the screen...do nothing instead of moving the paddle
-			going_left = false;//in case both buttons were pressed
-			going_right = false;
-			paddle_x = SCREEN_HEIGHT-paddle_length;
-		}
-		else
-		{
-			going_left = false;
-			going_right = true;
-			paddle_x += PADDLE_SPEED;
-		}
-	}
-	else
-	{//in all other cases, paddle does not move! This to avoid problems
-		going_left = false;//in case both buttons were pressed
-		going_right = false;
+	obj->direction = dir;
+	if ((obj->super.x - obj->speed >= 0) & (obj->super.x + obj->speed <= obj->x_max)) {
+		obj->super.x += obj->direction * obj->speed;
 	}
 }
 
+/*
 void set_difficulty(u8 diff){
 	switch(diff){
 		case 1: 								//easy level
@@ -92,6 +127,7 @@ void set_difficulty(u8 diff){
 			paddle_x = -1;
 	}
 }
+*/
 
 struct Brick brick[30];
 
@@ -412,7 +448,7 @@ void new_game()
 		}
 	}
 }
-
+/*
 void game()
 {
 	new_game();
@@ -424,7 +460,7 @@ void game()
 			bool dir_left = 0;
 			bool dir_right = 0;
 
-			/*
+
 			switch (Q_SIG())
 			{
 				case ENCODER_UP:
@@ -437,7 +473,6 @@ void game()
 					dir_right = 1;//checks if the paddle goes right
 				}
 			}
-			*/
 
 			paddle_move(dir_left,dir_right, ball_x);	//move it
 			paddle_draw(paddle_x);						//displays the paddle
@@ -467,4 +502,9 @@ void game()
 			}
 		}
 	}
+}*/
+void init_game() {
+	//init paddle
+
+	init_paddle(&paddle);
 }

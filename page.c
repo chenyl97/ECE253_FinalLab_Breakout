@@ -71,8 +71,6 @@ void initButton(Button* btn, char* str) {
 
 	btn->text_x = ((btn->super.w - text_w) >> 1) + btn->super.x;
 	btn->text_y = ((btn->super.h - text_h) >> 1) + btn->super.y;
-	initColor(&btn->focus, 30,10,10);
-	initColor(&btn->press, 50,30,30);
 }
 
 void initSlider(Slider* slider, char* str, u32 low, u32 high){
@@ -167,15 +165,15 @@ void initPageMain() {
 	initColor(&main_btn_arr[0].super.bg, 255, 255, 255);
 	initColor(&main_btn_arr[0].super.fg, 0, 0, 0);
     initButton(&main_btn_arr[0], "Start Game");
-    initColor(&main_btn_arr[0].focus, 0xff, 0, 0);
-    initColor(&main_btn_arr[0].press, 100, 0, 0);
+    initColor(&main_btn_arr[0].focus, 200, 200, 200);
+    initColor(&main_btn_arr[0].press, 100, 100, 100);
     main_btn_arr[0].target = (QStateHandler) &Final_game;
 
     initColor(&main_btn_arr[1].super.bg, 255, 255, 255);
 	initColor(&main_btn_arr[1].super.fg, 0, 0, 0);
     initButton(&main_btn_arr[1], "Setting");
-    initColor(&main_btn_arr[1].focus, 0xff, 0, 0);
-    initColor(&main_btn_arr[1].press, 100, 0, 0);
+    initColor(&main_btn_arr[1].focus, 200, 200, 200);
+    initColor(&main_btn_arr[1].press, 100, 100, 100);
     main_btn_arr[1].target = (QStateHandler) &Final_setting;
 
     page_main.textArr = main_text_arr;
@@ -198,21 +196,21 @@ void initPageConfig() {
 	arrange_sliders(3, 120, 30, SmallFont, config_slider_arr);
     initColor(&config_slider_arr[0].super.bg, 255, 255, 255);
 	initColor(&config_slider_arr[0].super.fg, 0, 0, 0);
-	initColor(&config_slider_arr[0].bar , 100, 0, 0);
-    initSlider(&config_slider_arr[0], "Ball Speed", 1, 5);
-	initColor(&config_slider_arr[0].focus,  0xff, 0, 0);
+	initColor(&config_slider_arr[0].bar , 100, 100, 100);
+    initSlider(&config_slider_arr[0], "Ball Speed", 1, 3);
+	initColor(&config_slider_arr[0].focus,  200, 200, 200);
 
     initColor(&config_slider_arr[1].super.bg, 255, 255, 255);
 	initColor(&config_slider_arr[1].super.fg, 0, 0, 0);
-	initColor(&config_slider_arr[1].bar , 100, 0, 0);
-    initSlider(&config_slider_arr[1], "Paddle Speed", 1, 5);
-	initColor(&config_slider_arr[1].focus,  0xff, 0, 0);
+	initColor(&config_slider_arr[1].bar , 100, 100, 100);
+    initSlider(&config_slider_arr[1], "Paddle Speed", 1, 3);
+	initColor(&config_slider_arr[1].focus,  200, 200, 200);
 
     initColor(&config_slider_arr[2].super.bg, 255, 255, 255);
 	initColor(&config_slider_arr[2].super.fg, 0, 0, 0);
-	initColor(&config_slider_arr[2].bar , 100, 0, 0);
-    initSlider(&config_slider_arr[2], "Paddle Length", 1, 5);
-	initColor(&config_slider_arr[2].focus,  0xff, 0, 0);
+	initColor(&config_slider_arr[2].bar , 100, 100, 100);
+    initSlider(&config_slider_arr[2], "Paddle Length", 1, 3);
+	initColor(&config_slider_arr[2].focus,  200, 200, 200);
 
 	//back button
 	initContent(&config_back_btn.super, 20, 10, 50, 50, BigFont);
@@ -235,7 +233,7 @@ void initPagePause() {
 	page_pause.buttonCount = 2;
 	page_pause.index = 0;
 	
-	initContent(&pause_text_arr[0].super, 20, 10, 200, 50, BigFont);
+	initContent(&pause_text_arr[0].super, 20, 10, 200, 80, BigFont);
     initColor(&pause_text_arr[0].super.bg, 255, 255, 255);
 	initColor(&pause_text_arr[0].super.fg, 0, 0, 0);
     initText(&pause_text_arr[0], "Pause", BigFont, 5);
@@ -254,7 +252,7 @@ void initPagePause() {
     initButton(&pause_btn_arr[1], "Exit");
     initColor(&pause_btn_arr[1].focus, 200, 200, 200);
     initColor(&pause_btn_arr[1].press, 100, 100, 100);
-    pause_btn_arr[1].target = (QStateHandler) &Final_main;
+    pause_btn_arr[1].target = (QStateHandler) &Final_on;
 
     page_pause.textArr = pause_text_arr;
 	page_pause.buttonArr = pause_btn_arr;
@@ -267,7 +265,7 @@ void initPageEnd() {
 	page_end.buttonCount = 2;
 	page_end.index = 0;    
 	
-	initContent(&end_text_arr[0].super, 20, 10, 200, 50, BigFont);
+	initContent(&end_text_arr[0].super, 20, 10, 200, 80, BigFont);
     initColor(&end_text_arr[0].super.bg, 255, 255, 255);
 	initColor(&end_text_arr[0].super.fg, 0, 0, 0);
     initText(&end_text_arr[0], "End", BigFont, 5);
@@ -279,7 +277,7 @@ void initPageEnd() {
     initButton(&end_btn_arr[0], "Restart");
     initColor(&end_btn_arr[0].focus, 200, 200, 200);
     initColor(&end_btn_arr[0].press, 100, 100, 100);
-    end_btn_arr[0].target = (QStateHandler) &Final_gaming;
+    end_btn_arr[0].target = (QStateHandler) &Final_game;
 
     initColor(&end_btn_arr[1].super.bg, 255, 255, 255);
 	initColor(&end_btn_arr[1].super.fg, 0, 0, 0);
@@ -330,16 +328,18 @@ QState HSM_template_button(FinalLab *me, Page* page, void* parent) {
 		case BUTTON_UP: {
 			if (page->index > 0){
 				page->index--;
+				drawPage(page);
 			}
 			//xil_printf("btn_up\n\r");
-			drawPage(page);
+			
 			return Q_HANDLED();
 		}
 		case BUTTON_DOWN: {
 			if (page->index < page->buttonCount - 1) {
 				page->index++;
+				drawPage(page);
 			}
-			drawPage(page);
+			
 			return Q_HANDLED();
 		}
 		case BUTTON_CENTER: {
@@ -380,15 +380,17 @@ QState HSM_template_slider(FinalLab *me, Page* page, void* parent) {
 		case BUTTON_UP: {
 			if (page->index > 0) {
 				page->index--;
+				drawPage(page);
 			}
-			drawPage(page);
+			
 			return Q_HANDLED();
 		}
 		case BUTTON_DOWN: {
 			if (page->index < page->sliderCount - 1) {
 				page->index++;
+				drawPage(page);
 			}
-			drawPage(page);
+			
 			return Q_HANDLED();
 		}
 		case BUTTON_LEFT: {
